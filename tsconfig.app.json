@@ -18,7 +18,15 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* Others */
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@holo-ui/*": ["lib/*"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "lib"]
 }
