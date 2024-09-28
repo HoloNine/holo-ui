@@ -9,12 +9,10 @@
   "sideEffects": [
     "**/*.css"
   ],
-  "main": "dist/holo-ui.udm.cjs",
-  "module": "dist/holo-ui.js",
+  "module": "dist/index.js",
   "exports": {
     ".": {
-      "import": "./dist/holo-ui.js",
-      "require": "./dist/holo-ui.udm.cjs"
+      "import": "./dist/index.js"
     }
   },
   "scripts": {
