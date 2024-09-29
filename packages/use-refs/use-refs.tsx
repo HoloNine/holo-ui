@@ -10,7 +10,7 @@ function composeRefs<T>(
 
       if (typeof ref === "function") {
         ref(value);
-      } else if (typeof ref === "object" && ref !== null) {
+      } else if (ref && "current" in ref) {
         (ref as React.MutableRefObject<T | null>).current = value;
       }
     });
