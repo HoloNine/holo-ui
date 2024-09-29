@@ -28,5 +28,5 @@
       "@holo-ui/*": ["packages/*"]
     }
   },
-  "include": ["packages"]
+  "include": ["src", "packages"],
 }

@@ -1,15 +1,17 @@
 import { resolve } from "path";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import dts from "vite-plugin-dts";
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    dts({ tsconfigPath: "./tsconfig.app.json", include: ["packages"] }),
+  ],
   build: {
     lib: {
       entry: resolve(__dirname, "packages/index.ts"),
-      name: "Holo UI",
-      fileName: "holo-ui",
       formats: ["es"],
     },
     copyPublicDir: false,
@@ -33,7 +35,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@holo-ui": resolve(__dirname, "lib"),
+      "@holo-ui": resolve(__dirname, "packages"),
     },
   },
 });
