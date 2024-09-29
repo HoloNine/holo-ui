@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      entry: resolve(__dirname, "lib/index.ts"),
+      entry: resolve(__dirname, "packages/index.ts"),
       name: "Holo UI",
       fileName: "holo-ui",
       formats: ["es"],
@@ -15,21 +15,18 @@ export default defineConfig({
     copyPublicDir: false,
     sourcemap: true,
     minify: "esbuild",
-    cssCodeSplit: true,
-    cssMinify: true,
     emptyOutDir: true,
-    outDir: "dist",
+    outDir: "build",
     rollupOptions: {
       external: ["react", "react-dom", "react/jsx-runtime"],
       output: {
         preserveModules: true,
-        preserveModulesRoot: "lib",
+        preserveModulesRoot: "packages",
         globals: {
           react: "React",
           "react-dom": "ReactDOM",
           "react/jsx-runtime": "jsxRuntime",
         },
-        assetFileNames: "[name][extname]",
         entryFileNames: "[name].js",
       },
     },

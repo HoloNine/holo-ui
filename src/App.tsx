@@ -1,11 +1,5 @@
-import { Thumb } from "../lib";
-
 const App = () => {
-  return (
-    <div>
-      <Thumb />
-    </div>
-  );
+  return <div></div>;
 };
 
 export default App;
