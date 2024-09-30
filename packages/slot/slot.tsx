@@ -163,7 +163,5 @@ function getElementRef(element: React.ReactElement) {
   return element.props.ref || (element as any).ref;
 }
 
-const Root = Slot;
-
-export { Slot, Slottable, Root };
+export { Slot, Slottable };
 export type { SlotProps };

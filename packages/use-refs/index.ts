@@ -1,1 +1,1 @@
-export * from "./use-refs";
+export { composeRefs, useRefs } from "./use-refs";
