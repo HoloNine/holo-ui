@@ -1,10 +1,8 @@
-import { Base } from "@holo-ui/primitives/base";
+import { ColorPicker } from "@holo-ui/components";
 
 const App = () => {
   return (
-    <Base.button asChild>
-      <a href="https://example.com">Click me!</a>
-    </Base.button>
+    <ColorPicker value="#ff0000" onChange={(color) => console.log(color)} />
   );
 };
 
