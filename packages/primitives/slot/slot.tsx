@@ -1,5 +1,5 @@
 import * as React from "react";
-import { composeRefs } from "../hooks/use-refs";
+import { composeRefs } from "../../hooks/use-refs";
 
 // Slot component
 interface SlotProps extends React.HTMLAttributes<HTMLElement> {

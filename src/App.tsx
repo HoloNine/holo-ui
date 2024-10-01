@@ -1,4 +1,4 @@
-import { Base } from "@holo-ui/base";
+import { Base } from "@holo-ui/primitives/base";
 
 const App = () => {
   return (
