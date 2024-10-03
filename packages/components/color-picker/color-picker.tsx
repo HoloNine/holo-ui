@@ -2,7 +2,7 @@ import * as React from "react";
 import { AlphaSlider } from "./alpha-slider/alpha-slider";
 import { HueSlider } from "./hue-slider/hue-slider";
 import { Saturation } from "./saturation/saturation";
-import { hsbToRgba } from "./color-utils";
+import { hsbToRgba } from "../../utils/color-utils";
 
 interface ColorPickerProps {
   value: string;

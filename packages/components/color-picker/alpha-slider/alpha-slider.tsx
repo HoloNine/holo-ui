@@ -1,6 +1,8 @@
 import * as React from "react";
 import { Thumb } from "../thumb/thumb";
 
+import { useDragTracking } from "../../../hooks/use-drag-tracking";
+
 interface AlphaSliderProps {
   value: number; // Current alpha value (0-1)
   onChange: (value: number) => void; // Callback when alpha changes
@@ -10,7 +12,7 @@ const AlphaSlider = ({ value, onChange }: AlphaSliderProps) => {
   const sliderRef = React.useRef<HTMLDivElement>(null);
 
   // Function to handle dragging and clicking on the slider
-  const handleMove = (event: React.MouseEvent | React.TouchEvent) => {
+  const handleMove = (event: MouseEvent | TouchEvent) => {
     if (!sliderRef.current) return;
 
     // Get the bounding rectangle of the slider
@@ -30,27 +32,7 @@ const AlphaSlider = ({ value, onChange }: AlphaSliderProps) => {
     onChange(newAlpha);
   };
 
-  // Handle mouse or touch drag
-  const handleMouseDown = (event: React.MouseEvent | React.TouchEvent) => {
-    handleMove(event);
-
-    const moveListener = (moveEvent: MouseEvent | TouchEvent) => {
-      handleMove(moveEvent as any); // Cast to any to handle both types
-    };
-
-    const stopListening = () => {
-      document.removeEventListener("mousemove", moveListener);
-      document.removeEventListener("mouseup", stopListening);
-      document.removeEventListener("touchmove", moveListener);
-      document.removeEventListener("touchend", stopListening);
-    };
-
-    // Listen for mouse or touch movement
-    document.addEventListener("mousemove", moveListener);
-    document.addEventListener("mouseup", stopListening);
-    document.addEventListener("touchmove", moveListener);
-    document.addEventListener("touchend", stopListening);
-  };
+  const { handleMouseDown } = useDragTracking(handleMove);
 
   // Calculate the thumb position as a percentage of the width
   const thumbX = value * 100;
