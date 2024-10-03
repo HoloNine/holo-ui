@@ -1,4 +1,4 @@
-import { ColorPicker } from "@holo-ui/components";
+import { ColorPicker } from "@holo-ui/primitives";
 
 const App = () => {
   return (

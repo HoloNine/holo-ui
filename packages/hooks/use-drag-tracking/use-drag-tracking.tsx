@@ -8,12 +8,18 @@ const useDragTracking = (
   const handleMouseDown = (event: React.MouseEvent | React.TouchEvent) => {
     const nativeEvent = event.nativeEvent as MouseEvent | TouchEvent;
 
+    // Ensure that the animation frame is reset at the start of a new drag interaction
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+
     const moveListener = (moveEvent: MouseEvent | TouchEvent) => {
       // Use requestAnimationFrame for smooth updates
       if (animationFrameRef.current === null) {
         animationFrameRef.current = requestAnimationFrame(() => {
           handleMove(moveEvent);
-          animationFrameRef.current = null; // Reset RAF reference
+          animationFrameRef.current = null; // Reset RAF reference after move
         });
       }
     };
@@ -21,6 +27,7 @@ const useDragTracking = (
     const stopListening = () => {
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
       }
       document.removeEventListener("mousemove", moveListener);
       document.removeEventListener("mouseup", stopListening);
