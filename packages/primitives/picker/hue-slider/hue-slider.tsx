@@ -1,70 +1,62 @@
 import * as React from "react";
+import { useDidUpdate, useMergedRef, useMove } from "../../../hooks";
 import { Thumb } from "../thumb/thumb";
 
-import { useDragTracking } from "../../../hooks/use-drag-tracking";
-
 interface HueSliderProps {
-  value: number; // Current hue value (0-360)
-  onChange: (value: number) => void; // Callback when hue changes
+  value: number;
+  maxValue?: number;
+  onChange: (value: number) => void;
+  onChangeEnd?: (value: number) => void;
+  onScrubStart?: () => void;
+  onScrubEnd?: () => void;
 }
 
-const HueSlider = ({ value, onChange }: HueSliderProps) => {
-  const sliderRef = React.useRef<HTMLDivElement>(null);
+const HueSlider = (
+  {
+    value,
+    onChange,
+    maxValue = 360,
+    onChangeEnd,
+    onScrubEnd,
+    onScrubStart,
+  }: HueSliderProps,
+  ref: React.Ref<HTMLDivElement>
+) => {
+  const [position, setPosition] = React.useState({ y: 0, x: value / maxValue });
+  const positionRef = React.useRef(position);
+  const getChangeValue = (val: number) => val * maxValue;
+  const { ref: sliderRef } = useMove(
+    ({ x, y }) => {
+      positionRef.current = { x, y };
+      onChange?.(getChangeValue(x));
+    },
+    {
+      onScrubEnd: () => {
+        const { x } = positionRef.current;
+        onChangeEnd?.(getChangeValue(x));
+        onScrubEnd?.();
+      },
+      onScrubStart,
+    }
+  );
 
-  // Function to handle dragging and clicking on the slider
-  const handleMove = (event: MouseEvent | TouchEvent) => {
-    if (!sliderRef.current) return;
-
-    // Get the bounding rectangle of the slider
-    const { left, width } = sliderRef.current.getBoundingClientRect();
-
-    // Get the mouse or touch position
-    const clientX =
-      "touches" in event ? event.touches[0].clientX : event.clientX;
-
-    // Calculate the relative position within the slider (0 - 1)
-    const relativeX = Math.min(Math.max(clientX - left, 0), width) / width;
-
-    // Convert the relative position to a hue value (0 - 360)
-    const newHue = relativeX * 360;
-
-    // Update the hue value
-    onChange(newHue);
-  };
-
-  // Handle mouse or touch drag
-  const { handleMouseDown } = useDragTracking(handleMove);
-
-  // Calculate the thumb position as a percentage of the width
-  const thumbX = (value / 360) * 100;
-  const thumbY = 50; // Fixed vertical position at 50% for horizontal sliders
+  useDidUpdate(() => {
+    setPosition({ y: 0, x: value / maxValue });
+  }, [value]);
 
   return (
     <div
       className="hue-slider"
-      ref={sliderRef}
-      onMouseDown={handleMouseDown}
-      onTouchStart={handleMouseDown}
-      style={{ position: "relative", width: "100%", height: "20px" }}
+      ref={useMergedRef(sliderRef, ref)}
+      style={{
+        position: "relative",
+        width: "100%",
+        height: "20px",
+        background:
+          "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
+      }}
     >
-      <div
-        className="hue-gradient"
-        style={{
-          background:
-            "linear-gradient(to right, red, yellow, green, cyan, blue, magenta, red)",
-          width: "100%",
-          height: "100%",
-          borderRadius: "4px",
-        }}
-      />
-      <Thumb
-        position={{ x: thumbX, y: thumbY }} // Pass the new position object
-        style={{
-          position: "absolute",
-          top: "50%",
-          transform: `translateX(-50%) translateY(-50%)`,
-        }}
-      />
+      <Thumb position={position} />
     </div>
   );
 };

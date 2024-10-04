@@ -1,24 +1,23 @@
-import React from "react";
+import { forwardRef } from "react";
 
-interface ThumbProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface ThumbProps extends React.ComponentPropsWithoutRef<"div"> {
   position: { x: number; y: number };
 }
 
-const Thumb = ({ position, ...props }: ThumbProps) => {
-  return (
+export const Thumb = forwardRef<HTMLDivElement, ThumbProps>(
+  ({ position }, ref) => (
     <div
-      {...props}
+      ref={ref}
       style={{
-        left: `${position.x}%`,
-        top: `${position.y}%`,
         position: "absolute",
-        width: "8px",
-        height: "8px",
-        backgroundColor: "black",
+        top: `${position.y * 100}%`,
+        left: `${position.x * 100}%`,
+        transform: "translate(-50%, -50%)",
+        width: "12px",
+        height: "12px",
+        border: "1px solid #000",
+        background: "transparent",
       }}
-      className="thumb"
     />
-  );
-};
-
-export { Thumb };
+  )
+);

@@ -2,68 +2,93 @@ import * as React from "react";
 import { AlphaSlider } from "./alpha-slider/alpha-slider";
 import { HueSlider } from "./hue-slider/hue-slider";
 import { Saturation } from "./saturation/saturation";
-import { hsbToRgba } from "../../utils/color-utils";
-import { ColorFormat } from "../../types/color.types";
 import { useDidUpdate } from "../../hooks/use-did-update";
+import { ColorFormat, HsvaColor } from "../../types/color.types";
+import { isColorValid, parseColor } from "../../utils/parsers";
+import { convertHsvaTo } from "@holo-ui/utils/converters";
 
 interface PickerProps {
   format?: ColorFormat;
   value: string;
   onChange: (value: string) => void;
+  onChangeEnd?: (value: string) => void;
 }
 
-const Picker = ({ format, value, onChange }: PickerProps) => {
+const Picker = ({ format, value, onChange, onChangeEnd }: PickerProps) => {
   const formatRef = React.useRef(format);
+  const valueRef = React.useRef<string>();
+  const scrubTimeoutRef = React.useRef<number>(-1);
+  const isScrubbingRef = React.useRef(false);
 
-  const [hue, setHue] = React.useState(0); // Hue is an angle from 0-360
-  const [alpha, setAlpha] = React.useState(1); // Alpha (0-1)
-  const [saturation, setSaturation] = React.useState(1); // Saturation (0-1)
-  const [brightness, setBrightness] = React.useState(1); // Brightness (0-1)
+  const [_value, setValue] = React.useState(value);
+
+  const [parsed, setParsed] = React.useState<HsvaColor>(parseColor(_value));
 
   useDidUpdate(() => {
-    if (isColorValid(value!) && !isScrubbingRef.current) {
+    if (isColorValid(value!)) {
       setParsed(parseColor(value!));
     }
   }, [value]);
 
-  // Handle changes from the HueSlider
-  const handleHueChange = (newHue: number) => {
-    setHue(newHue);
-    updateColor(newHue, saturation, brightness, alpha);
+  useDidUpdate(() => {
+    formatRef.current = format;
+    setValue(convertHsvaTo(format!, parsed));
+  }, [format]);
+
+  const handleChange = (color: Partial<HsvaColor>) => {
+    setParsed((current) => {
+      const next = { ...current, ...color };
+      valueRef.current = convertHsvaTo(formatRef.current!, next);
+      return next;
+    });
+
+    setValue(valueRef.current!);
+    onChange(valueRef.current!);
   };
 
-  // Handle changes from the AlphaSlider
-  const handleAlphaChange = (newAlpha: number) => {
-    setAlpha(newAlpha);
-    updateColor(hue, saturation, brightness, newAlpha);
+  const startScrubbing = () => {
+    window.clearTimeout(scrubTimeoutRef.current);
+    isScrubbingRef.current = true;
   };
 
-  // Handle changes from the Saturation component
-  const handleSaturationChange = (
-    newSaturation: number,
-    newBrightness: number
-  ) => {
-    setSaturation(newSaturation);
-    setBrightness(newBrightness);
-    updateColor(hue, newSaturation, newBrightness, alpha);
-  };
-
-  // Update the color and notify the parent component
-  const updateColor = (h: number, s: number, b: number, a: number) => {
-    const rgbaColor = hsbToRgba(h, s * 100, b * 100, a); // Convert to RGBA format
-    onChange(rgbaColor); // Call the parent with the new color
+  const stopScrubbing = () => {
+    window.clearTimeout(scrubTimeoutRef.current);
+    scrubTimeoutRef.current = window.setTimeout(() => {
+      isScrubbingRef.current = false;
+    }, 200);
   };
 
   return (
     <div className="color-picker">
       <Saturation
-        hue={hue}
-        saturation={saturation}
-        brightness={brightness}
-        onChange={handleSaturationChange}
+        value={parsed}
+        onChange={handleChange}
+        onChangeEnd={({ s, v }) =>
+          onChangeEnd?.(
+            convertHsvaTo(formatRef.current!, { ...parsed, s: s!, v: v! })
+          )
+        }
+        onScrubStart={startScrubbing}
+        onScrubEnd={stopScrubbing}
       />
-      <HueSlider value={hue} onChange={handleHueChange} />
-      <AlphaSlider value={alpha} onChange={handleAlphaChange} />
+      <HueSlider
+        value={parsed.h}
+        onChange={(h) => handleChange({ h })}
+        onChangeEnd={(h) =>
+          onChangeEnd?.(convertHsvaTo(formatRef.current!, { ...parsed, h }))
+        }
+        onScrubStart={startScrubbing}
+        onScrubEnd={stopScrubbing}
+      />
+      <AlphaSlider
+        value={parsed.a}
+        onChange={(a) => handleChange({ a })}
+        onChangeEnd={(a) => {
+          onChangeEnd?.(convertHsvaTo(formatRef.current!, { ...parsed, a }));
+        }}
+        onScrubStart={startScrubbing}
+        onScrubEnd={stopScrubbing}
+      />
     </div>
   );
 };
