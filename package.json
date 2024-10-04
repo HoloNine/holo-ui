@@ -4,17 +4,13 @@
   "version": "0.0.1",
   "type": "module",
   "files": [
-    "dist"
+    "build"
   ],
-  "sideEffects": [
-    "**/*.css"
-  ],
-  "main": "dist/holo-ui.udm.cjs",
-  "module": "dist/holo-ui.js",
+  "sideEffects": false,
+  "module": "build/index.js",
   "exports": {
     ".": {
-      "import": "./dist/holo-ui.js",
-      "require": "./dist/holo-ui.udm.cjs"
+      "import": "./build/index.js"
     }
   },
   "scripts": {
@@ -40,6 +36,7 @@
     "prettier": "^3.3.3",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^5.4.1"
+    "vite": "^5.4.1",
+    "vite-plugin-dts": "^4.2.2"
   }
 }
