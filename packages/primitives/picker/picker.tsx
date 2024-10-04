@@ -3,17 +3,28 @@ import { AlphaSlider } from "./alpha-slider/alpha-slider";
 import { HueSlider } from "./hue-slider/hue-slider";
 import { Saturation } from "./saturation/saturation";
 import { hsbToRgba } from "../../utils/color-utils";
+import { ColorFormat } from "../../types/color.types";
+import { useDidUpdate } from "../../hooks/use-did-update";
 
-interface ColorPickerProps {
+interface PickerProps {
+  format?: ColorFormat;
   value: string;
   onChange: (value: string) => void;
 }
 
-const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
+const Picker = ({ format, value, onChange }: PickerProps) => {
+  const formatRef = React.useRef(format);
+
   const [hue, setHue] = React.useState(0); // Hue is an angle from 0-360
   const [alpha, setAlpha] = React.useState(1); // Alpha (0-1)
   const [saturation, setSaturation] = React.useState(1); // Saturation (0-1)
   const [brightness, setBrightness] = React.useState(1); // Brightness (0-1)
+
+  useDidUpdate(() => {
+    if (isColorValid(value!) && !isScrubbingRef.current) {
+      setParsed(parseColor(value!));
+    }
+  }, [value]);
 
   // Handle changes from the HueSlider
   const handleHueChange = (newHue: number) => {
@@ -57,4 +68,4 @@ const ColorPicker = ({ value, onChange }: ColorPickerProps) => {
   );
 };
 
-export { ColorPicker };
+export { Picker };
